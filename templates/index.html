@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architectural Plan Generator</title>
+    <style>
+        /* Basic CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input[type="number"],
+        textarea {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #generated-plan {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f2f2f2;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HTML structure (updated) -->
+    <header>
+        <h1>Architectural Plan Generator</h1>
+    </header>
+    <main>
+        <form id="input-form" action="/generate-plan" method="POST">
+            <label for="num-rooms">Number of Rooms:</label>
+            <input type="number" id="num-rooms" name="num-rooms" required>
+            
+            <div id="room-dimensions">
+                <!-- Room dimension inputs will be added dynamically using JavaScript -->
+            </div>
+            
+            <label for="ai-input">AI Text Input:</label>
+            <textarea id="ai-input" name="ai-input" rows="4" required></textarea>
+            
+            <button type="button" onclick="generatePlan()">Generate Plan</button>
+        </form>
+        
+        <div id="generated-plan">
+            <!-- Generated plan will be displayed here -->
+        </div>
+    </main>
+    
+    <script>
+        // JavaScript code (updated)
+        document.getElementById('num-rooms').addEventListener('input', function() {
+            const numRooms = parseInt(this.value);
+            const roomDimensions = document.getElementById('room-dimensions');
+
+            // Clear existing room inputs
+            roomDimensions.innerHTML = '';
+
+            // Create inputs for each room
+            for (let i = 1; i <= numRooms; i++) {
+                const roomInput = document.createElement('div');
+                roomInput.classList.add('room-input');
+                roomInput.innerHTML = `
+                    <label for="room-${i}-length">Room ${i} Length:</label>
+                    <input type="number" id="room-${i}-length" name="room-${i}-length" required>
+                    
+                    <label for="room-${i}-width">Room ${i} Width:</label>
+                    <input type="number" id="room-${i}-width" name="room-${i}-width" required>
+                `;
+                roomDimensions.appendChild(roomInput);
+            }
+        });
+
+        function generatePlan() {
+            const numRooms = document.getElementById('num-rooms').value;
+            const aiInput = document.getElementById('ai-input').value;
+
+            let roomDimensions = '';
+            for (let i = 1; i <= numRooms; i++) {
+                const length = document.getElementById(`room-${i}-length`).value;
+                const width = document.getElementById(`room-${i}-width`).value;
+                roomDimensions += `Room ${i}: ${length}m x ${width}m<br>`;
+            }
+
+            const data = {
+            num_rooms: numRooms,
+            ai_input: aiInput,
+            room_dimensions: roomDimensions
+        };
+
+        fetch('/generate-plan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Do something with the JSON response if needed
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+    </script>
+</body>
+</html>
